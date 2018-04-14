@@ -85,15 +85,6 @@ class NotificationService(val subscriberRepository: SubscriberRepository) {
         notificationDetails.addProperty("renotify", false)
         notificationDetails.addProperty("requireInteraction", "true")
 
-//        val notificationActions = JsonObject()
-//        notificationActions.addProperty("action", "open")
-//        notificationActions.addProperty("title", "Open")
-//
-//        val notificationActionsArray = JsonArray()
-//        notificationActionsArray.add(notificationActions)
-//
-//        notificationDetails.add("actions", notificationActionsArray)
-
         val notificationData = JsonObject()
         notificationData.addProperty("url", "http://localhost:4200/")
         notificationData.addProperty("numberOfCases", 7)

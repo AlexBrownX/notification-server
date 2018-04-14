@@ -1,10 +1,11 @@
 package com.landg.services.notification.service
 
 import com.google.gson.Gson
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.landg.services.notification.exception.ServiceException
 import com.landg.services.notification.model.NotificationRequest
-import com.landg.services.notification.model.Subscriber
+import com.landg.services.notification.model.PushSubscriber
 import com.landg.services.notification.repository.SubscriberRepository
 import nl.martijndwars.webpush.Notification
 import nl.martijndwars.webpush.PushService
@@ -32,10 +33,18 @@ class NotificationService(val subscriberRepository: SubscriberRepository) {
     @Value("\${vapid.subject}")
     val subject: String? = null
 
-    fun storeSubscriber(subscriber: Subscriber): Long {
-        val result = this.subscriberRepository.save(subscriber)
-        LOG.info("Storing subscriber object: $result")
-        return result.clientIdentifier?: throw ServiceException("Could not generate client identifier to store subscriber")
+    fun storeSubscriber(pushSubscriber: PushSubscriber): Long? {
+        val existingSubscription = this.subscriberRepository.findByEndpoint(pushSubscriber.endpoint.orEmpty())
+
+        if (!existingSubscription.isEmpty()) {
+            LOG.info("Push subscriber already exists, sending back existing client identifier ${existingSubscription[0].clientIdentifier}")
+            return existingSubscription[0].clientIdentifier
+        }
+
+        val result = this.subscriberRepository.save(pushSubscriber)
+
+        LOG.info("Storing pushSubscriber object: $result")
+        return result.clientIdentifier?: throw ServiceException("Could not generate client identifier to store pushSubscriber")
     }
 
     fun sendNotification(notificationRequest: NotificationRequest): HttpResponse {
@@ -54,42 +63,53 @@ class NotificationService(val subscriberRepository: SubscriberRepository) {
         return httpResponse
     }
 
-    fun fetchSubscriber(notificationRequest: NotificationRequest): Subscriber {
+    fun fetchSubscriber(notificationRequest: NotificationRequest): PushSubscriber {
         val subscriber = this.subscriberRepository.findById(notificationRequest.clientIdentifier)
         LOG.info("Retrieved subscription object: $subscriber")
 
         return subscriber.get()
     }
 
-    fun createSubscription(subscriber: Subscriber): Subscription {
-        val jsonSub = Gson().toJson(subscriber);
+    fun createSubscription(pushSubscriber: PushSubscriber): Subscription {
+        val jsonSub = Gson().toJson(pushSubscriber);
         return Gson().fromJson(jsonSub, Subscription::class.java)
     }
-
-    /*
-        TODO - These are valid Chrome notification properties
-
-        "actions"
-        "body"
-        "dir"
-        "icon"
-        "lang"
-        "renotify"
-        "requireInteraction"
-        "tag"
-        "vibrate"
-        "data"
-     */
 
     fun createPayload(notificationRequest: NotificationRequest): String {
         val notificationDetails = JsonObject()
         notificationDetails.addProperty("title", notificationRequest.title)
         notificationDetails.addProperty("body", notificationRequest.body)
-        notificationDetails.addProperty("data", notificationRequest.data)
+        notificationDetails.addProperty("icon", "https://www.shareicon.net/data/128x128/2015/12/24/692291_business_512x512.png")
+        notificationDetails.addProperty("badge", "https://www.shareicon.net/data/128x128/2015/12/24/692291_business_512x512.png")
+        notificationDetails.addProperty("lang", "en")
+        notificationDetails.addProperty("renotify", false)
+        notificationDetails.addProperty("requireInteraction", "true")
+
+//        val notificationActions = JsonObject()
+//        notificationActions.addProperty("action", "open")
+//        notificationActions.addProperty("title", "Open")
+//
+//        val notificationActionsArray = JsonArray()
+//        notificationActionsArray.add(notificationActions)
+//
+//        notificationDetails.add("actions", notificationActionsArray)
+
+        val notificationData = JsonObject()
+        notificationData.addProperty("url", "http://localhost:4200/")
+        notificationData.addProperty("numberOfCases", 7)
+        notificationData.addProperty("readyCases", 5)
+        notificationData.addProperty("requireActionCases", 1)
+        notificationData.addProperty("inProgressCases", 1)
+        notificationData.addProperty("noActionCases", 0)
+
+        notificationDetails.add("data", notificationData)
 
         val jsonPayload = JsonObject()
         jsonPayload.add("notification", notificationDetails)
 
-        return jsonPayload.toString()
+        val result = jsonPayload.toString();
+
+        LOG.info("JSON Payload: $result")
+        return result
     }
 }

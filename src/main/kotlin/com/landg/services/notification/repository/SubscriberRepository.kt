@@ -1,9 +1,9 @@
 package com.landg.services.notification.repository
 
-import com.landg.services.notification.model.Subscriber
+import com.landg.services.notification.model.PushSubscriber
 import org.springframework.data.repository.CrudRepository
 
-interface SubscriberRepository: CrudRepository<Subscriber, Long> {
+interface SubscriberRepository: CrudRepository<PushSubscriber, Long> {
 
-    fun findByClientIdentifier(clientIdentifier: Long): List<Subscriber>
+    fun findByEndpoint(endpoint: String): List<PushSubscriber>
 }

@@ -1,6 +1,6 @@
 # Notification Service
 
-This is a Spring Boot service that allows a [web app client](http://udcbitbucket.lgnet.co.uk/projects/CS/repos/web-push-notification-client/browse) to register itself as a subscriber to web push notifications. The service can also trigger web push notifications using the subscriber details.
+This is a Spring Boot service that allows a [web app client](http://udcbitbucket.lgnet.co.uk/projects/CS/repos/web-push-notification-client/browse) to register itself as a pushSubscriber to web push notifications. The service can also trigger web push notifications using the pushSubscriber details.
 
 
 ## IDE

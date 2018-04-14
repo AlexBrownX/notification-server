@@ -2,14 +2,14 @@ package com.landg.services.notification.controller
 
 import com.google.gson.Gson
 import com.landg.services.notification.model.NotificationRequest
-import com.landg.services.notification.model.Subscriber
+import com.landg.services.notification.model.PushSubscriber
 import com.landg.services.notification.service.NotificationService
 import com.wordnik.swagger.annotations.ApiOperation
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
-@CrossOrigin("https://wp-notification-client.herokuapp.com")
+@CrossOrigin
 @RestController
 class NotificationController(val notificationService: NotificationService) {
 
@@ -19,13 +19,13 @@ class NotificationController(val notificationService: NotificationService) {
 
     @PostMapping("/registerSubscriber")
     @ApiOperation(
-        value = "Stores a subscriber endpoint",
-        notes = "Responds with unique client ID if subscription was stored successfully"
+        value = "Stores a pushSubscriber",
+        notes = "Responds with unique client ID if the subscriber was stored successfully"
     )
-    fun subscribe(@RequestBody subscriber: Subscriber): ResponseEntity<Long> {
-        LOG.info("Subscriber received: $subscriber")
+    fun subscribe(@RequestBody pushSubscriber: PushSubscriber): ResponseEntity<Long> {
+        LOG.info("PushSubscriber received: $pushSubscriber")
 
-        val id = this.notificationService.storeSubscriber(subscriber)
+        val id = this.notificationService.storeSubscriber(pushSubscriber)
         return ResponseEntity.ok(id)
 }
 

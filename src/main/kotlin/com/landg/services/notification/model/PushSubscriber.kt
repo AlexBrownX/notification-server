@@ -6,7 +6,7 @@ import javax.persistence.GeneratedValue
 import javax.persistence.Id
 
 @Entity
-data class Subscriber(
+data class PushSubscriber(
     @GeneratedValue @Id val clientIdentifier: Long? = 0,
     val endpoint: String? = "",
     val expirationTime: String? = "",

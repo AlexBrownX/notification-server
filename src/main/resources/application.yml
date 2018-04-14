@@ -1,0 +1,36 @@
+# Vapid credentials created using npm web-push
+# $ web-push generate-vapid-keys --json
+
+vapid:
+  publicKey: your_vapid_public_key
+  privateKey: your_vapid_private_key
+  subject: mailto:your@email.com
+
+# Sprint Properties
+spring:
+  application:
+    name: notificationservice
+
+  mvc:
+    throw-exception-if-no-handler-found: true
+
+  resources:
+    add-mappings: false
+
+  jackson:
+    deserialization:
+      accept-empty-string-as-null-object: true
+      fail_on_ignored_properties: true
+      fail_on_unknown_properties: true
+      fail_on_null_for_primitives: true
+      fail_on_reading_dup_tree_key: true
+      fail_on_missing_creator_properties: true
+
+server:
+  port: 9001
+  servlet:
+    context-path: /notifications
+
+  error:
+    whitelabel:
+      enabled: false
